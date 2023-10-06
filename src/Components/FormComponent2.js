@@ -6,7 +6,6 @@ import Dropdown from './DropDown';
 import { LanguageContext } from './LanguageContext';
 import RadioButtonGroup from './RadioButtonGroup';
 import { labels } from './Labels';
-import { useNavigate } from 'react-router-dom';
 
 const formStyles = css`
   max-width: 500px;
@@ -55,7 +54,7 @@ const FormComponent = () => {
     orgType: '',
     feedback:'',
   });
-  let navigate = useNavigate();
+
   const handleInputChange = (event) => {
     const { name, value } = event.target;
     setFormValues({
@@ -74,9 +73,8 @@ const FormComponent = () => {
     const answers = Object.entries(formValues).map(
       ([key, value]) => `${key}: ${value}`
     ).join('\n');
-    const email = event.target.email.value
-    navigate(`/${encodeURIComponent(email)}`);
-    // alert(answers);
+  
+    alert(answers);
   };
   function getTranslation(key, lang) {
     return labels[lang][key];
