@@ -7,6 +7,7 @@ import { LanguageContext } from './LanguageContext';
 import RadioButtonGroup from './RadioButtonGroup';
 import { labels } from './Labels';
 import { useNavigate } from 'react-router-dom';
+import {defaultFormValues} from './defaultFormValues';
 
 const formStyles = css`
   max-width: 500px;
@@ -43,18 +44,8 @@ const submitButtonStyles = css`
 const FormComponent = () => {
   const { language } = useContext(LanguageContext);
   
-  const [formValues, setFormValues] = useState({
-    email: '',
-    contactName: '',
-    contactPreference: '',
-    contactPosition: '',
-    region: '',
-    country: '',
-    municipality: '',
-    orgName: '',
-    orgType: '',
-    feedback:'',
-  });
+  const [formValues, setFormValues] = useState(defaultFormValues);
+  
   let navigate = useNavigate();
   const handleInputChange = (event) => {
     const { name, value } = event.target;
@@ -65,19 +56,38 @@ const FormComponent = () => {
   };
   const [errors, setErrors] = useState({});
   const handleSubmit = (event) => {
+    console.log("Submitting form...")
     event.preventDefault();
+    
     if (!formValues.email) {
       setErrors({ email: language === 'en' ? 'Email is required.' : 'Требуется электронная почта.' });
       return;
     }
-    setErrors({});  
-    const answers = Object.entries(formValues).map(
-      ([key, value]) => `${key}: ${value}`
-    ).join('\n');
-    const email = event.target.email.value
-    navigate(`/${encodeURIComponent(email)}`);
-    // alert(answers);
-  };
+    const updatedFormValues = {
+      ...formValues,
+
+    };
+
+    setErrors({});
+    console.log(updatedFormValues)
+    
+    fetch('http://localhost:5000/save-form', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify(updatedFormValues) // use the updated form values with null fields
+    })
+    .then(response => response.json())
+    .then(data => {
+      console.log("Data saved:", data);
+      navigate(`/waiting?email=${encodeURIComponent(updatedFormValues.email)}`); // use the email from updatedFormValues
+    })
+    .catch(error => {
+      console.error("Error saving data:", error);
+    });
+};
+  
   function getTranslation(key, lang) {
     return labels[lang][key];
   }
@@ -234,16 +244,18 @@ const FormComponent = () => {
 />
 <TextInput 
     label={
-        <span>
-            {getTranslation('feedback', language)} 
-            <a href="mailto:Soil-doctor@fao.org">Soil-doctor@fao.org</a>
-        </span>
+        <>
+            <span>
+                {getTranslation('feedback', language)} 
+                <a href="mailto:Soil-doctor@fao.org">Soil-doctor@fao.org</a>
+            </span>
+        </>
     }
     name="feedback" 
-    value={formValues.contactPosition} 
+    value={formValues.feedback} 
     onChange={handleInputChange} 
-  />
-      
+/>
+
 <input css={submitButtonStyles} type="submit" value={getTranslation('submit',language)} />
     </form>
   );

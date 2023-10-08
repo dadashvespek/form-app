@@ -1,4 +1,10 @@
 export const labels = {
+    pending: {
+        en: "Your application is still pending review.",
+        ru: "Ваша заявка все еще находится на рассмотрении.",
+        es: "Su solicitud todavía está pendiente de revisión.",
+        fr: "Votre demande est toujours en cours d'examen."
+      },
     en: {
         email: "Email:",
         contactName: "Name of the contact person:",
@@ -18,7 +24,11 @@ export const labels = {
         accessToFunds: "Do you have access to funds to ensure the sustainability of the programme?",
         agreementWithToR: "Did you read and agree with the ToR?",
         feedback:"Your feedback is valuable to us, and can help us improve the programme over time and tailor it to promoters’ and farmers’ needs. Please also do not hesitate to contact us at ",
-        submit: "Submit"
+        submit: "Submit",
+        actorType: 'What type of actor are you applying for?',
+        currentStage: 'Current stage of application',
+        institutionNameForMap: 'Institution name for the map',
+
     },
     ru: {
         email: "Электронная почта:",
@@ -40,6 +50,9 @@ export const labels = {
         agreementWithToR: "Вы прочитали и согласны с ТЗ (техническим заданием)?",
         feedback:"Ваши отзывы ценны для нас и могут помочь нам улучшить программу с течением времени и адаптировать ее к потребностям промоутеров и фермеров. Пожалуйста, также не стесняйтесь обращаться к нам по адресу",
         submit: "Отправить",
+        actorType: 'Какого типа актера вы хотите выбрать?',
+        currentStage: 'Текущий этап заявки',
+        institutionNameForMap: 'Название учреждения для карты',
     },
     es: {
         email: "Correo electrónico:",
@@ -61,6 +74,12 @@ export const labels = {
         agreementWithToR: "¿Ha leído y está de acuerdo con el TdR (términos de referencia)?",
         feedback:"Sus comentarios son muy valiosos para nosotros y pueden ayudarnos a mejorar el programa con el tiempo y a adaptarlo a las necesidades de los promotores y agricultores. No dude en ponerse en contacto con nosotros en ",
         submit: "Enviar",
+        actorType: 'Quel type d\'acteur souhaitez-vous appliquer?',
+        currentStage: 'Etapa actual de la solicitud',
+        institutionNameForMap: 'Nombre de la institución para el mapa',
+        
+        
+        
     },    fr: {
         email: "E-mail :",
         contactName: "Nom de la personne de contact :",
@@ -81,6 +100,9 @@ export const labels = {
         agreementWithToR: "Avez-vous lu et accepté les Termes de Référence (TdR) ?",
         feedback:"Vos commentaires sont précieux pour nous et peuvent nous aider à améliorer le programme et à l'adapter aux besoins des promoteurs et des agriculteurs. N'hésitez pas non plus à nous contacter à l'adresse ",
         submit: "Soumettre",
+        actorType: '¿Para qué tipo de actor estás aplicando?',
+        currentStage: 'Étape actuelle de la demande',
+        institutionNameForMap: 'Nom de l’institution pour la carte',
     }
     // Add more languages here
   };

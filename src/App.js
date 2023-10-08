@@ -5,11 +5,13 @@ import FormComponent from './Components/FormComponent';
 import LanguageSelector from './Components/LanguageSelector';
 import { LanguageProvider } from './Components/LanguageContext';
 import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
-import UserResponseComponent from './Components/UserResponseComponent';
+import FormComponent2 from './Components/FormComponent2';
+import WaitingPage from './Components/WaitingPage';
 
 const appStyles = css`
   display: flex;
   flex-direction: column;
+  height:100%;
   align-items: center;
   padding: 2em;
   font-family: 'Lato', sans-serif;
@@ -27,8 +29,9 @@ function App() {
               <Router>
                   <LanguageSelector />
                   <Routes>
-                      <Route path="/" element={<FormComponent />} />
-                      <Route path="/:userEmail" element={<UserResponseComponent />} />
+                      <Route path="/" element={<FormComponent/>} />
+                      <Route path="/waiting" element={<WaitingPage/>} />
+                      <Route path="/:userEmail" element={<FormComponent2/>} />
                   </Routes>
               </Router>
           </div>

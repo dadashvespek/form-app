@@ -20,7 +20,10 @@ const radioGroupStyles = css`
   .radio-options {
     display: flex;
     flex-direction: column;
-
+    input[type="radio"]:disabled + label::before {
+      background-color: #f5f5f5;
+      border-color: #d0d0d0;
+      cursor: not-allowed;
     .radio-option {
       display: flex;
       align-items: center;
@@ -68,7 +71,7 @@ const radioGroupStyles = css`
   }
 `;
 
-const RadioButtonGroup = ({ label, name, value, onChange, translationKey }) => {
+const RadioButtonGroup = ({ label, name, value, onChange, translationKey, locked = false }) => {
   const { language } = useContext(LanguageContext);
 
   const options = translations[language]?.options[translationKey] || [];
@@ -85,7 +88,8 @@ const RadioButtonGroup = ({ label, name, value, onChange, translationKey }) => {
               value={option} 
               checked={value === option}
               onChange={onChange}
-              id={`${name}-${index}`}  
+              id={`${name}-${index}`}
+              disabled={locked}
             />
             <label htmlFor={`${name}-${index}`}>{option}</label>
           </div>
@@ -94,5 +98,6 @@ const RadioButtonGroup = ({ label, name, value, onChange, translationKey }) => {
     </div>
   );
 };
+
 
 export default RadioButtonGroup;

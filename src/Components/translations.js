@@ -1,6 +1,7 @@
 import { countries_en, countries_ru, countries_fr, countries_es } from './countries';
 
 export const translations = {
+  
   en: {
     options: {
       orgType: [
@@ -46,7 +47,8 @@ export const translations = {
       agreementWithToR: [
         'Yes, I would like to implement the programme as a promoter and be trained by the GSP',
         'No, I would like to implement the programme as collaborator'
-      ]
+      ],
+      actorType: ['Collaborator', 'Local Promoter', 'Sub-national Promoter', 'National Promoter'],
     }
   },
   ru: {
@@ -94,9 +96,12 @@ export const translations = {
       agreementWithToR: [
         'Да, я хотел бы реализовать программу в качестве промоутера и пройти обучение в GSP',
         'Нет, я хотел бы реализовать программу в качестве сотрудника'
-      ]
+      ],
+      actorType: ['Сотрудник', 'Местный Промоутер', 'Субнациональный Промоутер', 'Национальный Промоутер'],
+
     }
   },
+
   fr: {
     options: {
       orgType: [
@@ -142,7 +147,8 @@ export const translations = {
       agreementWithToR: [
         'Oui, je voudrais mettre en œuvre le programme en tant que promoteur et être formé par le GSP',
         'Non, je voudrais mettre en œuvre le programme en tant que collaborateur'
-      ]
+      ],
+      actorType: ['Collaborateur', 'Promoteur Local', 'Promoteur Sous-national', 'Promoteur National'],
     }
   },
   es: {
@@ -190,7 +196,8 @@ export const translations = {
       agreementWithToR: [
         'Sí, me gustaría implementar el programa como promotor y ser entrenado por el GSP',
         'No, me gustaría implementar el programa como colaborador'
-      ]
+      ],
+      actorType: ['Colaborador', 'Promotor Local', 'Promotor Subnacional', 'Promotor Nacional'],
     }
   }
 };

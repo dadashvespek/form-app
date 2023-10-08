@@ -31,6 +31,12 @@ const textInputStyles = css`
     &::placeholder {
       color: #aaa;
     }
+
+    &.locked {
+      background-color: #f5f5f5;
+      cursor: not-allowed;
+      border-color: #d0d0d0;
+    }
   }
 
   .error {
@@ -40,7 +46,7 @@ const textInputStyles = css`
   }
 `;
 
-const TextInput = ({ label, name, value, onChange, error }) => {
+const TextInput = ({ label, name, value, onChange, error, locked = false }) => {
   return (
     <div css={textInputStyles}>
       <label htmlFor={name}>{label}</label>
@@ -50,7 +56,8 @@ const TextInput = ({ label, name, value, onChange, error }) => {
         value={value} 
         onChange={onChange} 
         required={name === 'email'}
-
+        readOnly={locked}
+        className={locked ? "locked" : ""}
       />
       {error && <div className="error">{error}</div>}
     </div>

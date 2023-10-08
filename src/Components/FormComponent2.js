@@ -1,14 +1,37 @@
 /** @jsxImportSource @emotion/react */
 import { css } from '@emotion/react';
-import React, { useState, useContext } from 'react';
+import React, { useState, useEffect, useContext } from 'react';
 import TextInput from './TextInput';
-import Dropdown from './DropDown';
+// import Dropdown from './DropDown';
 import { LanguageContext } from './LanguageContext';
 import RadioButtonGroup from './RadioButtonGroup';
 import { labels } from './Labels';
+import { useNavigate } from 'react-router-dom';
+import {defaultFormValues} from './defaultFormValues';
 
+const stageContainerStyles = css`
+display: flex;
+align-items: center;
+margin-bottom: 20px; // Add some margin at the bottom for spacing
+`;
+const stageStyles = css`
+  padding: 6px 5px;
+  margin-left: 10px;
+  background-color: #f4f4f9; // A light grey for a subtle background
+  border-radius: 5px;
+  margin-bottom: 0px;
+  box-shadow: 0px 3px 10px rgba(0, 0, 0, 0.1);
+  font-weight: bold;
+  font-size: 0.85em;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  span {
+    color: #0077cc; // Making the stage text the same color as your submit button for consistency
+  }
+`;
 const formStyles = css`
-  max-width: 500px;
+max-width: 500px;
   margin: 40px auto;
   padding: 2em;
   display: flex;
@@ -30,31 +53,126 @@ const submitButtonStyles = css`
   font-weight: bold;
   cursor: pointer;
   transition: all 0.3s ease;
+
   &:hover {
     background-color: #005fa3;
     transform: translateY(-2px);
     box-shadow: 0px 2px 10px rgba(0, 0, 0, 0.15);
   }
+
   &:active {
     transform: translateY(0);
   }
+
+  &[disabled] {
+    background-color: #aaa; 
+    cursor: not-allowed;   
+
+    &:hover {
+      background-color: #aaa;  
+      transform: none;         
+      box-shadow: none;        
+    }
+  }
 `;
+
+const iconStyles = {
+  display: 'flex',
+  flexDirection: 'row',
+  alignItems: 'center',
+  gap: '8px'
+};
+
+const circleStyles = {
+  border: '2px solid #333',
+  borderRadius: '50%',
+  width: '10px',
+  height: '10px',
+  display: 'flex',
+  justifyContent: 'center',
+  alignItems: 'center',
+  fontSize: '12px',
+  fontWeight: 'bold'
+};
+
+
+const NotRegisteredIcon = () => (
+  <div style={iconStyles}>
+    <div style={{ ...circleStyles, borderColor: '#FF4D4F' }}>
+      X
+    </div>
+    <span style={{ color: '#FF4D4F' }}>Not Registered Yet</span>
+  </div>
+);
+
+const RegisteredIcon = () => (
+  <div style={iconStyles}>
+    <div style={{ ...circleStyles, borderColor: '#4CAF50' }}>
+      ✓
+    </div>
+    <span style={{ color: '#4CAF50' }}>Registered</span>
+  </div>
+);
 const FormComponent = () => {
+  const [isFormLocked, setIsFormLocked] = useState(false);
+
   const { language } = useContext(LanguageContext);
-  
+
   const [formValues, setFormValues] = useState({
-    email: '',
-    contactName: '',
-    contactPreference: '',
-    contactPosition: '',
-    region: '',
-    country: '',
-    municipality: '',
-    orgName: '',
-    orgType: '',
-    feedback:'',
+    defaultFormValues
   });
 
+  const [isLoading, setIsLoading] = useState(true);
+
+  useEffect(() => {
+    console.log("useEffect triggered");
+  
+    const email = window.location.pathname.substring(1);
+    console.log("Parsed email from URL:", email);
+  
+    if (email) {
+      setIsLoading(true);
+      console.log("Making fetch request for:", email);
+  
+      fetch(`http://localhost:5000/get-application?email=${email}`)
+        .then(response => {
+          console.log("Server responded with status:", response.status);
+  
+          if (response.ok) {
+            return response.json();
+          }
+  
+          throw new Error('Network response was not ok.');
+        })
+        .then(data => {
+          console.log("Received data from server:", data);
+  
+          setFormValues(prevState => ({
+            ...prevState,
+            ...data
+          }));
+          setIsLoading(false);
+          console.log("Form values updated and loading stopped");
+          if (data.stage === 'Awaiting Confirmation') {
+            setIsFormLocked(true);
+          }
+      
+          setIsLoading(false);
+          console.log("Form values updated and loading stopped");
+        
+        })
+        .catch(error => {
+          console.log('There was a problem with the fetch operation:', error.message);
+          setIsLoading(false);
+        });
+    } else {
+      console.log("Email not found in the URL. Skipping fetch operation.");
+      setIsLoading(false);
+    }
+  }, []);
+  
+
+  let navigate = useNavigate();
   const handleInputChange = (event) => {
     const { name, value } = event.target;
     setFormValues({
@@ -65,184 +183,96 @@ const FormComponent = () => {
   const [errors, setErrors] = useState({});
   const handleSubmit = (event) => {
     event.preventDefault();
+  
     if (!formValues.email) {
       setErrors({ email: language === 'en' ? 'Email is required.' : 'Требуется электронная почта.' });
       return;
     }
-    setErrors({});  
-    const answers = Object.entries(formValues).map(
-      ([key, value]) => `${key}: ${value}`
-    ).join('\n');
   
-    alert(answers);
+    setErrors({});
+  
+    const updatedFormData = {
+      ...formValues,
+      stage: 'Awaiting Confirmation' // Adding the desired stage to the form data
+    };
+  
+    // Send a post request to the backend to update the data and status
+    fetch('http://localhost:5000/update-application-status', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(updatedFormData)
+    })
+    .then(response => response.json())
+    .then(data => {
+      if (data.status === 'success') {
+        
+        navigate(`/email`);
+      } else {
+        console.error(data.message);
+      }
+    })
+    .catch(error => {
+      console.error('Error updating the application status:', error);
+    });
   };
+
+  
   function getTranslation(key, lang) {
     return labels[lang][key];
   }
+  function getTranslation2(key, lang) {
+    return labels[key][lang];
+  }
+  if (isLoading) {
+    return <div>Loading...</div>;
+  }
+  console.log(formValues.stage)
   
+  console.log(formValues.registeredInMap)
   return (
     <form css={formStyles} onSubmit={handleSubmit}>
-  <TextInput 
-    label={getTranslation('email', language)} 
-    name="email" 
-    value={formValues.email} 
-    onChange={handleInputChange}
-    error={errors.email} 
-  />
-  <TextInput 
-    label={getTranslation('contactName', language)} 
-    name="contactName" 
-    value={formValues.contactName} 
-    onChange={handleInputChange} 
-  />
-  <TextInput 
-    label={getTranslation('contactPreference', language)} 
-    name="contactPreference" 
-    value={formValues.contactPreference} 
-    onChange={handleInputChange} 
-  />
-  <TextInput 
-    label={getTranslation('contactPosition', language)} 
-    name="contactPosition" 
-    value={formValues.contactPosition} 
-    onChange={handleInputChange} 
-  />
-  <Dropdown
-    label = {getTranslation('region', language)}
-    name="region"
-    value={formValues.region}
-    onChange={handleInputChange}
-    translationKey="regions"
-    />
-  <Dropdown
-    label={getTranslation('country', language)}
-    name="country"
-    value={formValues.country}
-    onChange={handleInputChange}
-    translationKey="countries"
-  />
-  <TextInput 
-    label={getTranslation('municipality', language)} 
-    name="municipality" 
-    value={formValues.municipality} 
-    onChange={handleInputChange} 
-  />
-  <TextInput 
-    label={getTranslation('orgName', language)} 
-    name="orgName" 
-    value={formValues.orgName} 
-    onChange={handleInputChange} 
-  />
-  <Dropdown
-    label={getTranslation('orgType', language)}
-    name="orgType"
-    value={formValues.orgType}
-    onChange={handleInputChange}
-    translationKey="orgType"
-  />
-  <RadioButtonGroup
-    label={getTranslation('ongoingProgram', language)}
-    name="ongoingProgram"
-    value={formValues.ongoingProgram}
-    onChange={handleInputChange}
-    translationKey="ongoingProgram"
-  />
-  <Dropdown
-    label={getTranslation('soilTopics', language)}
-    name="soilTopics"
-    value={formValues.soilTopics}
-    onChange={handleInputChange}
-    translationKey="soilTopics"
-  />
-  <Dropdown
-    label={getTranslation('implementationScale', language)}
-    name="implementationScale"
-    value={formValues.implementationScale}
-    onChange={handleInputChange}
-    translationKey="implementationScale"
-  />
-  <RadioButtonGroup
-    label={getTranslation('involveInstitutions', language)}
-    name="involveInstitutions"
-    value={formValues.involveInstitutions}
-    onChange={handleInputChange}
-    translationKey="involveInstitutions"
-  />
-  <Dropdown
-    label={getTranslation('targetCommunitySize', language)}
-    name="targetCommunitySize"
-    value={formValues.targetCommunitySize}
-    onChange={handleInputChange}
-    translationKey="targetCommunitySize"
-  />
-  <RadioButtonGroup
-    label={getTranslation('developedMaterials', language)}
-    name="developedMaterials"
-    value={formValues.developedMaterials}
-    onChange={handleInputChange}
-    translationKey="developedMaterials"
-  />
-  <RadioButtonGroup
-    label={getTranslation('accessToFunds', language)}
-    name="accessToFunds"
-    value={formValues.accessToFunds}
-    onChange={handleInputChange}
-    translationKey="accessToFunds"
-  />
-<RadioButtonGroup
-    label={
-        <span>
-            {language === 'en' ? 'Did you read and agree with the ' : 
-             language === 'ru' ? 'Вы прочитали и согласны с ' :
-             language === 'fr' ? 'Avez-vous lu et accepté le ' :
-             language === 'es' ? '¿Has leído y estás de acuerdo con el ' :
-             'Did you read and agree with the '}
-            <a 
-                href={
-                    language === 'en'
-                        ? 'https://www.fao.org/fileadmin/user_upload/GSP/GSDP/documents/GSDP_TOR_promoters_EN_20_03_2023.pdf' 
-                        : language === 'ru'
-                        ? 'https://www.fao.org/fileadmin/user_upload/GSP/Soil_doctor/GSDP_TOR_promoters_RU_20_03_2023_.pdf'
-                        : language === 'fr'
-                        ? 'https://www.fao.org/fileadmin/user_upload/GSP/GSDP/documents/GSDP_TOR_promoters_FR_20_03_2023.pdf' 
-                        : language === 'es'
-                        ? 'https://www.fao.org/fileadmin/user_upload/GSP/GSDP/documents/GSDP_TOR_promoters_ES_20_03_2023.pdf' 
-                        : 'https://www.fao.org/fileadmin/user_upload/GSP/GSDP/documents/GSDP_TOR_promoters_EN_20_03_2023.pdf'
-                }
-                target="_blank" 
-                rel="noopener noreferrer"
-            >
-                {language === 'en' ? 'ToR' : 
-                 language === 'ru' ? 'T3' :
-                 language === 'fr' ? 'termes de référence' :
-                 language === 'es' ? 'términos de referencia' :
-                 'ToR'}
-            </a>
-            {language === 'en' ? '?' : 
-             language === 'ru' ? '?' :
-             language === 'fr' ? '?' :
-             language === 'es' ? '?' :
-             '?'}
-        </span>
-    }
-    name="agreementWithToR"
-    value={formValues.agreementWithToR}
-    onChange={handleInputChange}
-    translationKey="agreementWithToR"
-/>
-<TextInput 
-    label={
-        <span>
-            {getTranslation('feedback', language)} 
-            <a href="mailto:Soil-doctor@fao.org">Soil-doctor@fao.org</a>
-        </span>
-    }
-    name="feedback" 
-    value={formValues.contactPosition} 
-    onChange={handleInputChange} 
-  />
-      
-<input css={submitButtonStyles} type="submit" value={getTranslation('submit',language)} />
+      <div css={stageContainerStyles}>
+        <span>{getTranslation('currentStage', language)}:</span> 
+        {formValues.stage && 
+          <div css={stageStyles}>
+            <span>{formValues.stage}</span>
+          </div>
+        }
+      </div>
+      <TextInput 
+        label={getTranslation('email', language)} 
+        name="email" 
+        value={formValues.email} 
+        onChange={handleInputChange}
+        error={errors.email} 
+        locked={isFormLocked || true} // Email is always locked based on your code
+      />
+      <RadioButtonGroup
+        label={getTranslation('actorType', language)}
+        name="actorType"
+        value={formValues.actorType}
+        onChange={handleInputChange}
+        translationKey="actorType"
+        error={errors.actorType}
+        locked={isFormLocked}
+      />
+  
+      <div style={{ alignItems: 'left', fontSize:'12px'}}>
+        <TextInput 
+          label={getTranslation('institutionNameForMap', language)} 
+          name="mapInstitutionName" 
+          value={formValues.mapInstitutionName} 
+          onChange={handleInputChange}
+          error={errors.mapInstitutionName}
+          locked={isFormLocked}
+        />
+        {formValues.registeredInMap ? <RegisteredIcon /> : <NotRegisteredIcon />}
+      </div>
+
+
+<input css={submitButtonStyles} type="submit" value={getTranslation('submit',language)} disabled={isFormLocked} />
     </form>
   );
 
