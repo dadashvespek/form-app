@@ -17,6 +17,11 @@ const pendingPageStyles = css`
     color: #757575; // Gentle color for text
     margin: 20px 0; // Spacing above and below the text
   }
+  p2 {
+    font-size: 0.8 rem;
+    color: #757575; // Gentle color for text
+    margin: 20px 0; // Spacing above and below the text
+  }
 `;
 const contentWrapper = css`
   display: flex;
@@ -110,6 +115,7 @@ return (
             </div>
           </div>
           <p >{labels.pending[language]}</p>
+          <p2>{labels.revisitlink[language]}</p2>
         </div>
       )}
     </div>

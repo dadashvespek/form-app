@@ -4,6 +4,12 @@ export const labels = {
         ru: "Ваша заявка все еще находится на рассмотрении.",
         es: "Su solicitud todavía está pendiente de revisión.",
         fr: "Votre demande est toujours en cours d'examen."
+      },    
+      revisitlink: {
+          en: "Please re-visit this link once you have been contacted to check your application's progress.",
+          ru: "Пожалуйста, перейдите по этой ссылке еще раз после того как с вами свяжутся, чтобы проверить статус вашей заявки.",
+          es: "Por favor, vuelva a visitar este enlace una vez que hayan contactado con usted para verificar el progreso de su solicitud.",
+          fr: "Veuillez revisiter ce lien une fois que vous avez été contacté pour vérifier l'avancement de votre demande."
       },
     en: {
         email: "Email:",

@@ -123,21 +123,22 @@ const FormComponent = () => {
   });
 
   const [isLoading, setIsLoading] = useState(true);
-
+  
+  
   useEffect(() => {
     console.log("useEffect triggered");
-  
+    
     const email = window.location.pathname.substring(1);
     console.log("Parsed email from URL:", email);
-  
+    
     if (email) {
       setIsLoading(true);
       console.log("Making fetch request for:", email);
   
       fetch(`http://localhost:5000/get-application?email=${email}`)
-        .then(response => {
+      .then(response => {
           console.log("Server responded with status:", response.status);
-  
+          
           if (response.ok) {
             return response.json();
           }
@@ -156,10 +157,10 @@ const FormComponent = () => {
           if (data.stage === 'Awaiting Confirmation') {
             setIsFormLocked(true);
           }
-      
+          
           setIsLoading(false);
           console.log("Form values updated and loading stopped");
-        
+          
         })
         .catch(error => {
           console.log('There was a problem with the fetch operation:', error.message);
@@ -171,8 +172,9 @@ const FormComponent = () => {
     }
   }, []);
   
-
   let navigate = useNavigate();
+
+
   const handleInputChange = (event) => {
     const { name, value } = event.target;
     setFormValues({
@@ -207,6 +209,7 @@ const FormComponent = () => {
     .then(response => response.json())
     .then(data => {
       if (data.status === 'success') {
+        window.location.reload();
         
         navigate(`/email`);
       } else {
@@ -222,9 +225,9 @@ const FormComponent = () => {
   function getTranslation(key, lang) {
     return labels[lang][key];
   }
-  function getTranslation2(key, lang) {
-    return labels[key][lang];
-  }
+  // function getTranslation2(key, lang) {
+  //   return labels[key][lang];
+  // }
   if (isLoading) {
     return <div>Loading...</div>;
   }
